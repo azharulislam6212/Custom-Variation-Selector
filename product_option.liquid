@@ -1,0 +1,120 @@
+     <div class="product-upsell__item  color-{{ block.settings.color_scheme }} gradient">
+                            <div class="product-upsell-card">
+                              {% if product != blank %}
+                                <div class="product-upsell__image" id="upsell-image-{{ block.id }}" >
+                                  <div
+                                    class="media media--{{ block.settings.image_ratio}}"
+                                    {% if block.settings.image_ratio == 'adapt' and product.featured_image != blank %}
+                                      style="padding-bottom: {{ 1 | divided_by: product.featured_image.aspect_ratio | times: 100 }}%;"
+                                    {% endif %}
+                                  >
+                                    {% render 'resposive-img' with image: product.featured_image %}
+                                  </div>
+                                </div>
+                              {% endif %}
+                              <div class="product-upsell__content">
+                                <h3 class="product-upsell__title">{{ product.title }}</h3>
+
+                                <p class="product-upsell__price" id="price-{{ block.id }}">
+                                  {{ product.price | money }}
+                                </p>
+
+
+                                <div class="product__info  mb-36 gap-24 d-flex fd-column" >
+                              
+
+                                {%- unless product.has_only_default_variant -%}
+                                <variant-selects class="no-js-hidden variant_swatch drowpdown-variation" data-sparent="{{ section.id }}" data-section="{{ block.id }}" data-url="{{ product.url }}" data-update-url="true">
+                                  <div class="product__variants--selects-custom d-flex  no-js-hidden" >
+                                {%- for option in product.options_with_values -%}
+                                    <div class="product-form__input product-form__input--dropdown js-selectbox-wrapper">
+                                     <label class="form__label  hidden" for="Option-{{ block.id }}-{{ forloop.index0 }}">
+                                      {{ option.name }}:
+                                    </label>
+                                    <div class="field__select p-relative p-zero d-block ">
+                                      <select id="Option-{{ section.id  }}-{{ forloop.index0 }}"
+                                              class="select__select form__control w-100 h-100 field__text field--large field--hover js-variant-select-item"
+                                              name="options[{{ option.name | escape }}]"
+                                              form="product-form-{{ section.id  }}"
+                                              >
+                                        {%- for value in option.values -%}
+                                        <option class="js-variant-item" value="{{ value | escape }}" {% if option.selected_value == value %}selected="selected"{% endif %}>
+                                          {{ value }}
+                                        </option>
+                                        {%- endfor -%}
+                                      </select>
+                                      {% render 'icon-chevron-down', size: '16px', class: 'icon p-absolute pe-none' %}
+                                    </div>
+                                    </div>
+                                  {%- endfor -%}
+                                  </div>
+                            
+                                  <script type="application/json">{{ product.variants | json }}</script>
+                                </variant-selects>
+                              {%- endunless -%}
+                              </div>
+
+                                <div class="product__form">
+                                  <sht-prd-frm
+                                    class="sht-product__form product-form d-grid gap-12"
+                                    data-section="{{ section.id }}"
+                                  >
+                                    <div
+                                      class="form--error js-product-form-error-wrapper"
+                                      data-type="error-wrapper"
+                                      role="alert"
+                                      hidden
+                                    >
+                                      <span class="d-flex middle-xs">
+                                        <span class="icon--error icon icon--small mr-8 fs-0">
+                                          {%- render 'icon-warning', size: 16 -%}
+                                        </span>
+                                        <span class="js-product-form-error-message" data-type="error-message"></span>
+                                      </span>
+                                    </div>
+                                    {%- form 'product',
+                                      product,
+                                      id: product_form_id,
+                                      class: 'form form__fields',
+                                      novalidate: 'novalidate',
+                                      data-type: 'add-to-cart-form'
+                                    -%}
+                                      <div class="form__field">
+                                        <input
+                                          type="hidden"
+                                          class="form__control"
+                                          name="id"
+                                          value="{{ product.selected_or_first_available_variant.id }}"
+                                          disabled
+                                        >
+                                      </div>
+                                      <div class="product-form__buttons d-flex top-xs fd-column">
+                                        <div class="gap-12 d-flex w-100 fd-column">
+                                          <button
+                                            type="submit"
+                                            name="add"
+                                            class="js-product-form-submit-btn product-btn-atc btn btn-primary btn-custom  btn-custom--large w-100 fw-700"
+                                            {% if product.selected_or_first_available_variant.available == false %}
+                                              disabled
+                                              {% assign add_to_cart_btn_lbl = 'products.product.sold_out' | t %}
+                                            {% else %}
+                                              {% assign add_to_cart_btn_lbl = 'products.product.add_to_cart' | t %}
+                                            {% endif %}
+                                          >
+                                            <span class="p-relative d-flex middle-xs center-xs ta-center">
+                                              <span class="js-product-form-submit-btn-text wb-break-word">
+                                                {{ add_to_cart_btn_lbl }} - {{ product.price | money }}
+                                              </span>
+                                              <span class="js-product-form-spinner product-form-spinner p-absolute icon">
+                                                {%- render 'icon-spinner', size: '24px' -%}
+                                              </span>
+                                            </span>
+                                          </button>
+                                        </div>
+                                      </div>
+                                    {%- endform -%}
+                                  </sht-prd-frm>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
